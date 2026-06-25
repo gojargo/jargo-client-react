@@ -33,6 +33,11 @@ export function VoiceBot() {
   useJargoEvent("botLlmText", ({ text }) => {
     if (text) setLines((l) => appendCoalesced(l, "bot", text));
   });
+  // Fixed bot speech (TTSSpeakFrame -> bot-tts-text), e.g. the "Oui ?" wake ack.
+  // It's not LLM output, so show it as its own line.
+  useJargoEvent("botTtsText", ({ text }) => {
+    if (text.trim()) setLines((l) => [...l, { who: "bot", text }]);
+  });
   useJargoEvent("botStartedSpeaking", () => setBotSpeaking(true));
   useJargoEvent("botStoppedSpeaking", () => setBotSpeaking(false));
   useJargoEvent("userStartedSpeaking", () => setUserSpeaking(true));
