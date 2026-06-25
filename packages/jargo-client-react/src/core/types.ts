@@ -34,6 +34,12 @@ export interface JargoClientOptions {
   offerPath?: string;
   /** Max time to wait for ICE gathering before POSTing the offer. Default 3000ms. */
   iceGatherTimeoutMs?: number;
+  /**
+   * Target audio jitter-buffer depth in ms (a cushion that absorbs server
+   * send-jitter / bursty TTS so playback doesn't click). Default 150; set 0 to
+   * leave the browser's adaptive default.
+   */
+  jitterBufferMs?: number;
 }
 
 export interface UserTranscript {

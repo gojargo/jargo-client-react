@@ -16,6 +16,10 @@ const DEFAULT_ICE: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
 ];
 
+// A modest jitter-buffer cushion smooths server-side send jitter / bursty TTS
+// without much added latency. Set jitterBufferMs to 0 to disable.
+const DEFAULT_JITTER_BUFFER_MS = 150;
+
 export interface TransportHandlers {
   onStateChange(state: TransportState): void;
   /** A parsed data-channel message (RTVI or otherwise). */
@@ -71,6 +75,7 @@ export class JargoTransport {
       this.pc = pc;
 
       pc.ontrack = (e) => {
+        this.tuneJitterBuffer(e.receiver);
         const stream = e.streams[0] ?? new MediaStream([e.track]);
         this.handlers.onRemoteTrack(stream);
       };
@@ -125,6 +130,29 @@ export class JargoTransport {
       this.setState("error");
       await this.disconnect();
       throw err;
+    }
+  }
+
+  // tuneJitterBuffer deepens the receiver's audio jitter buffer. The server
+  // paces audio at real time, but small gaps (Go scheduling, or a TTS that
+  // streams in bursts) can otherwise drain a shallow buffer mid-utterance and
+  // produce a catch-up burst — heard as clicks / "machine-gun". A larger target
+  // trades a little latency for a cushion that plays through those gaps.
+  private tuneJitterBuffer(receiver: RTCRtpReceiver | undefined): void {
+    const ms = this.opts.jitterBufferMs ?? DEFAULT_JITTER_BUFFER_MS;
+    if (!receiver || ms <= 0) return;
+    const r = receiver as unknown as {
+      jitterBufferTarget?: number | null;
+      playoutDelayHint?: number | null;
+    };
+    try {
+      if ("jitterBufferTarget" in receiver) {
+        r.jitterBufferTarget = ms; // ms, standardized
+      } else {
+        r.playoutDelayHint = ms / 1000; // seconds, legacy Chrome
+      }
+    } catch {
+      // best-effort; unsupported in some browsers
     }
   }
 
