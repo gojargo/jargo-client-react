@@ -1,0 +1,17 @@
+{
+  "name": "jargo-client-react-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "jargo browser client + React bindings, and a Next.js example.",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @gojargo/jargo-client-react",
+    "typecheck": "npm run typecheck -w @gojargo/jargo-client-react",
+    "dev:lib": "npm run dev -w @gojargo/jargo-client-react",
+    "dev:example": "npm run dev -w jargo-nextjs-voicebot",
+    "example": "npm run dev -w jargo-nextjs-voicebot"
+  }
+}

@@ -1,0 +1,14 @@
+jargo-client-react
+==================
+
+A browser client (classic WebRTC) and React bindings for jargo voice servers
+(https://github.com/gojargo/jargo).
+
+This is original work. It speaks the RTVI protocol (the real-time voice
+interface used by Pipecat, created by Daily) so it can interoperate with
+jargo's RTVI/WebRTC transport. "Pipecat" and "RTVI" are referenced here solely
+for accurate description of the wire protocol; this project is independent and
+not affiliated with, sponsored by, or endorsed by Daily.
+
+Copyright (c) 2026 the jargo authors. Licensed under the BSD 2-Clause License
+(see LICENSE).
